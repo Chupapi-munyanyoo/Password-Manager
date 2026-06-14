@@ -154,7 +154,7 @@ public:
 		node* temp = head;
 		while (temp)
 		{
-			if (temp->username == b)
+			if (temp->website == b)
 			{
 				cout << "Website: " << temp->website << ", Username: " << temp->username << ", Password: " << decrypt(temp->password) << endl;
 			}
@@ -206,31 +206,53 @@ public:
 		}
 		return hash % size;
 	}
-
-	void insert(string website, string username, string password) {
+	
+	
+	void insert(string website, string username, string password,bool fromfile) {
 		int index = hashfunction(website);
-		table[index].insert(website, username, password);
-	}
+		if(fromfile)
+			table[index].insert(website, username, password);
+		else
+			table[index].insert(website,username,encrypt(password));
 
+		ofstream in("Passwords.txt",ios::app);
+
+		if(!fromfile)
+			append(in,website,username,encrypt(password));
+
+	}
+	void append(ofstream& in,string a,string b,string c)
+	{
+		in<<a<<" "<<b<<" "<<c<<endl;
+		in.close();
+	}
 	void readfromfile()
 	{
-		ifstream file("C:/Users/Administrator/Passes/Password.txt");
-		if (!file)return;
+		ifstream file("Passwords.txt");
+		if (!file)
+		{
+			ofstream f("Passwords.txt");
+			f.close();
+
+			return;
+		}
 		string a = "", b = "", c = "";
-		while (file >> a >> b >> c)
+		while (file >> a >> b)
 		{
 			
+			getline(file,c);
 			
 			if (a != "" && b != "" && c != "")
 			{
-				insert(a, b, c);
+				insert(a, b, c,true);
 			}
 		}
+		file.close();
 	}
 	
 	void writetofile()
 	{
-		ofstream file("C:/Users/Administrator/Passes/Password.txt");
+		ofstream file("Passwords.txt");
 		for (int i = 0; i < size; i++) {
 			node* temp = table[i].returnhead();
 			while (temp)
@@ -239,11 +261,13 @@ public:
 				temp = temp->next;
 			}
 		}
+		file.close();
 	}
 
 	void remove(string website, string username) {
 		int index = hashfunction(website);
 		table[index].remove(website, username);
+		writetofile();
 	}
 
 	void update(string website, string username, string password) {
@@ -263,9 +287,9 @@ public:
 		table[index].display(website, username);
 	}
 
-	void display(string username) {
+	void display(string website) {
 		for (int i = 0; i < size; i++) {
-			table[i].display(username);
+			table[i].display(website);
 		}
 	}
 
@@ -280,29 +304,31 @@ class PasswordManager
 	hashmap* LOL;
 
 public: 
-	PasswordManager() :LOL(new hashmap) {};
+	PasswordManager():LOL(new hashmap) {
+		LOL->readfromfile();
+	};
 	void insert(string a, string b, string c)
 	{
-		LOL->insert(a, b, c);
+		LOL->insert(a, b, c,0);
 	}
 	void remove(string a, string b)
 	{
-		remove(a, b);
+		LOL->remove(a, b);
 	}
 	void update(string a, string b, string c)
 	{
-		update(a, b, c);
+		LOL->update(a, b, c);
 	}
 	void display()
 	{
-		display();
+		LOL->display();
 	}
 	void display(string a, string b)
 	{
-		display(a, b);
+		LOL->display(a, b);
 	}
 	void display(string b)
 	{
-		display(b);
+		LOL->display(b);
 	}
 };
