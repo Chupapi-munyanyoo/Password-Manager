@@ -17,6 +17,7 @@ void options()
 }
 int main()
 {
+	
 	greetings();
 
 	PasswordManager Test;

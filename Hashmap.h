@@ -239,7 +239,8 @@ public:
 		string a = "", b = "", c = "";
 		while (file >> a >> b)
 		{
-			
+			char ws;
+			file>>ws;
 			getline(file,c);
 			
 			if (a != "" && b != "" && c != "")
